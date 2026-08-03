@@ -1,0 +1,166 @@
+{{ 'component-marquee-text.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  #Marquee-{{ section.id }} {
+    --marquee-text-duration: {{ section.settings.speed }}s;
+    --marquee-text-gap: {{ section.settings.item_gap }}px;
+    --marquee-text-font-size: {{ section.settings.text_size }}px;
+    --marquee-text-divider-size: {{ section.settings.text_size | times: 0.9 | round: 0 }}px;
+  }
+
+  #Marquee-{{ section.id }} .marquee-text__track {
+    animation-direction: {% if section.settings.direction == 'right' %}reverse{% else %}normal{% endif %};
+  }
+{%- endstyle -%}
+
+{%- if section.blocks.size > 0 -%}
+  <div class="color-{{ section.settings.color_scheme }} gradient section-{{ section.id }}-padding">
+    <div
+      id="Marquee-{{ section.id }}"
+      class="marquee-text{% if section.settings.pause_on_hover %} marquee-text--paused-hover{% endif %}"
+    >
+      <div class="marquee-text__track" aria-label="Scrolling text">
+        {%- for i in (1..2) -%}
+          <div class="marquee-text__group"{% if i == 2 %} aria-hidden="true"{% endif %}>
+            {%- for block in section.blocks -%}
+              <p class="marquee-text__item" {{ block.shopify_attributes }}>{{ block.settings.text | escape }}</p>
+              {%- if section.settings.show_divider -%}
+                <span class="marquee-text__divider">
+                  {{- 'icon-sparkle-divider.svg' | inline_asset_content -}}
+                </span>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Marquee text",
+  "class": "section-marquee-text",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "scheme-4"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 10,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Text size",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "item_gap",
+      "min": 8,
+      "max": 64,
+      "step": 4,
+      "unit": "px",
+      "label": "Space between items",
+      "default": 16
+    },
+    {
+      "type": "checkbox",
+      "id": "show_divider",
+      "label": "Show divider icon",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Scroll direction",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 5,
+      "max": 60,
+      "step": 5,
+      "unit": "s",
+      "label": "Scroll speed",
+      "info": "Time for one full loop. Lower is faster.",
+      "default": 20
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 16
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Text item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Unparalleled Hair Expertise"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Marquee text",
+      "blocks": [
+        { "type": "text", "settings": { "text": "Unparalleled Hair Expertise" } },
+        { "type": "text", "settings": { "text": "Luxury Redefined" } },
+        { "type": "text", "settings": { "text": "Natural Beauty, Amplified" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
